@@ -25,4 +25,6 @@ MAINTAINER Nicolas De Loof <nicolas.deloof@gmail.com>
 
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
+RUN apt-get update && apt-get install -y libltdl7 && rm -rf /var/lib/apt/lists/*
+
 ENTRYPOINT ["jenkins-slave"]
