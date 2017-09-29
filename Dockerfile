@@ -26,7 +26,9 @@ MAINTAINER Nicolas De Loof <nicolas.deloof@gmail.com>
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
 USER root
-RUN apt-get update && apt-get install -y libltdl7 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libltdl7 python-pip && rm -rf /var/lib/apt/lists/* && pip install awscli && \
+    curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
+    chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl
 USER jenkins
 
 ENTRYPOINT ["jenkins-slave"]
