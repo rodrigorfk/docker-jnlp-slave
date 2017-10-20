@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install -y libltdl7 python-pip zip && rm -rf /var/
     curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl && \
     curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh && chmod 700 get_helm.sh && ./get_helm.sh && \
-    rm get_helm.sh && usermod -aG docker jenkins
+    rm get_helm.sh && groupadd docker && usermod -aG docker jenkins
 USER jenkins
 
 ENTRYPOINT ["jenkins-slave"]
