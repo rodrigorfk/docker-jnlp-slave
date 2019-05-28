@@ -25,13 +25,19 @@ MAINTAINER Oleg Nenashev <o.v.nenashev@gmail.com>
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols" Vendor="Jenkins project" Version="3.27"
 
 COPY jenkins-slave /usr/local/bin/jenkins-slave
+ENV KUBERNETES_VERSION=v1.11.6
+ENV HELM_VERSION=v2.6.1
 
 USER root
-RUN apt-get update && apt-get install -y libltdl7 python-pip zip && rm -rf /var/lib/apt/lists/* && pip install awscli && \
-    curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
+RUN apt-get update && apt-get install -y libltdl7 python-pip zip apt-transport-https ca-certificates curl gnupg2 software-properties-common && \
+    curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" && apt-get update && \
+    apt-get install -y docker-ce docker-ce-cli containerd.io && \
+    rm -rf /var/lib/apt/lists/* && pip install awscli && \
+    curl -LO https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl && \
-    curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh && chmod 700 get_helm.sh && ./get_helm.sh && \
-    rm get_helm.sh && groupadd docker && usermod -aG docker jenkins
+    curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh && chmod 700 get_helm.sh && DESIRED_VERSION=${HELM_VERSION} ./get_helm.sh && \
+    rm get_helm.sh && usermod -aG docker jenkins
 USER jenkins
 
 ENTRYPOINT ["jenkins-slave"]
