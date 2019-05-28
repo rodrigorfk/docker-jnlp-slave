@@ -27,9 +27,10 @@ LABEL Description="This is a base image, which allows connecting Jenkins agents 
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 ENV KUBERNETES_VERSION=v1.11.6
 ENV HELM_VERSION=v2.6.1
+ENV DOCKER_GROUP_ID=993
 
 USER root
-RUN apt-get update && apt-get install -y libltdl7 python-pip zip apt-transport-https ca-certificates curl gnupg2 software-properties-common && \
+RUN apt-get update && groupadd -g ${DOCKER_GROUP_ID} docker && apt-get install -y libltdl7 python-pip zip apt-transport-https ca-certificates curl gnupg2 software-properties-common && \
     curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
     add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" && apt-get update && \
     apt-get install -y docker-ce docker-ce-cli containerd.io && \
