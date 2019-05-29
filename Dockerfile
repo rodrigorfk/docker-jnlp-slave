@@ -30,7 +30,9 @@ ENV HELM_VERSION=v2.6.1
 ENV DOCKER_GROUP_ID=993
 
 USER root
-RUN apt-get update && groupadd -g ${DOCKER_GROUP_ID} docker && apt-get install -y libltdl7 python-pip zip apt-transport-https ca-certificates curl gnupg2 software-properties-common && \
+RUN usermod -u 10000 jenkins && groupmod -g 10000 jenkins && groupadd -g ${DOCKER_GROUP_ID} docker && usermod -aG docker jenkins && \
+    apt-get update  && \
+    apt-get install -y libltdl7 python-pip zip apt-transport-https ca-certificates curl gnupg2 software-properties-common && \
     curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
     add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" && apt-get update && \
     apt-get install -y docker-ce docker-ce-cli containerd.io && \
@@ -38,7 +40,7 @@ RUN apt-get update && groupadd -g ${DOCKER_GROUP_ID} docker && apt-get install -
     curl -LO https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl && \
     curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh && chmod 700 get_helm.sh && DESIRED_VERSION=${HELM_VERSION} ./get_helm.sh && \
-    rm get_helm.sh && usermod -aG docker jenkins
+    rm get_helm.sh 
 USER jenkins
 
 ENTRYPOINT ["jenkins-slave"]
